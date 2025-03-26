@@ -6,15 +6,6 @@ import { Label } from "./components/label";
 import { GameCard } from "@/components/GameCard";
 import { Metadata } from "next";
 
-
-import  PageProps  from "next";
-
-interface PropsParams {
-    params: {
-        id: string;
-    };
-}
-
 interface PageProps {
     params: {
       id: string;
