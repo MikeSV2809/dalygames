@@ -15,7 +15,13 @@ interface PropsParams {
     };
 }
 
-export async function generateMetadata({ params }: PropsParams): Promise<Metadata> {
+interface PageParams {
+    params: {
+      id: string;
+    };
+  }
+
+  export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
     try {
         const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${params.id}`, { next: { revalidate: 60 } });
 
@@ -68,7 +74,7 @@ async function getGameSorted() {
     }
 }
 
-export default async function Game({ params }: PropsParams) {
+export default async function Game({ params }: PageParams) {
     const data: GameProps = await getData(params.id);
     const sortedGame: GameProps = await getGameSorted();
 
