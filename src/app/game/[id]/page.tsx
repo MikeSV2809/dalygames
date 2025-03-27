@@ -6,44 +6,34 @@ import { Label } from "./components/label";
 import { GameCard } from "@/components/GameCard";
 import { Metadata } from "next";
 
-interface PropsParams {
-    params: {
-        id: string;
-    }
-}
 
-export async function generateMetadata({ params }: PropsParams): Promise<Metadata> {
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+    const { id } = await params;
+
     try {
-        const response: GameProps = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${params.id}`, { next: { revalidate: 60 } })
-            .then((res) => res.json())
-            .catch(() => {
-                return {
-                    title: "DalyGames - Descubra jogos incríveis para se divertir."
-                }
-            })
+        const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=game&id=${id}`, { 
+            next: { revalidate: 60 } 
+        });
 
-            return{
+        if (!res.ok) {
+            throw new Error("Falha ao buscar os dados do jogo");
+        }
+
+        const response: GameProps = await res.json();
+
+        return {
+            title: response.title,
+            description: `${response.description.slice(0, 100)}...`,
+            openGraph: {
                 title: response.title,
-                description: `${response.description.slice(0, 100)}...`,
-                openGraph: {
-                    title: response.title,
-                    images: [response.image_url]
-                },
-                robots: {
-                    index: true,
-                    follow: true,
-                    nocache: true,
-                    googleBot: {
-                      index: true,
-                      follow: true,
-                      noimageindex: true,
-                    }
-                }
+                images: [response.image_url]
             }
+        };
     } catch (err) {
         return {
             title: "DalyGames - Descubra jogos incríveis para se divertir."
-        }
+        };
     }
 }
 
@@ -65,9 +55,10 @@ async function getGameSorted() {
     }
 }
 
-export default async function Game({params} :{
-    params: Promise<{ id: string }>}){
-    
+export default async function Game({ params }: {
+    params: Promise<{ id: string }>
+}) {
+
     const id = (await params).id;
     const data: GameProps = await getData(id)
     const sortedGame: GameProps = await getGameSorted();
