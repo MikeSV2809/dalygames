@@ -6,9 +6,11 @@ import { Label } from "./components/label";
 import { GameCard } from "@/components/GameCard";
 import { Metadata } from "next";
 
+interface PropsParams {
+    params: Promise<{ id: string}>
+}
 
-
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+export async function generateMetadata({ params }: PropsParams): Promise<Metadata> {
     const { id } = await params;
 
     try {
